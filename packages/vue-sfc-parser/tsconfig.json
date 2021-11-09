@@ -1,0 +1,10 @@
+{
+  "extends": "@cprize/typescript-config",
+    "compilerOptions": {
+      "sourceMap": true,
+      "declaration": true,
+      "declarationMap": true,
+      "declarationDir": "./lib/types",
+      "outDir": "./lib",
+  }
+}
