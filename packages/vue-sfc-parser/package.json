@@ -11,16 +11,6 @@
     "dev": "tsc -w",
     "build": "tsc"
   },
-  "devDependencies": {
-    "cz-conventional-changelog": "^3.3.0",
-    "husky": "^7.0.4",
-    "lint-staged": "^11.2.6"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
   "dependencies": {
     "@vue/compiler-dom": "^3.2.20"
   }
