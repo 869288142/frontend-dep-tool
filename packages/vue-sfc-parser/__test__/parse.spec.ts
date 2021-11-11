@@ -42,7 +42,6 @@ describe('parse sfc', () => {
     expect(Parser.parse(content).script).toBeInstanceOf(Array)
     expect(Parser.parse(content).template).toBeInstanceOf(Array)
     expect(Parser.parse(content).style).toBeInstanceOf(Array)
-
   })
 })
 describe('parse template', () => {
