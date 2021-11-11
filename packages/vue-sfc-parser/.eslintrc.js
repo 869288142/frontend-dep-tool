@@ -1,3 +1,3 @@
 module.exports = {
-  "extends": "@cprize/eslint-config-standard"
-}
+  extends: '@cprize/eslint-config-standard',
+};
