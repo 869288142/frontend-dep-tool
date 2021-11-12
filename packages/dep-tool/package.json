@@ -1,0 +1,19 @@
+{
+  "name": "dep-tool",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "加把劲骑士 <869288142@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "index.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "@cprize/vue-sfc-parser": "^1.0.0"
+  }
+}

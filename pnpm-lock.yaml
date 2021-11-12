@@ -33,6 +33,9 @@ importers:
     devDependencies:
       lerna: 3.22.1
 
+  packages/dep-tool:
+    specifiers: {}
+
   packages/vue-sfc-parser:
     specifiers:
       '@vue/compiler-dom': ^3.2.20

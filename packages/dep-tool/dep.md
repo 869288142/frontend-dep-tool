@@ -1,0 +1,7 @@
+ "@babel/parser": "^7.13.16",
+    "@babel/traverse": "^7.13.17",
+    "chalk": "^4.1.1",
+    "fast-glob": "^3.2.5",
+    "postcss": "^8.2.12",
+    "postcss-less": "^4.0.1",
+    "postcss-scss": "^3.0.5",
