@@ -1,18 +1,21 @@
-const parser = require('@babel/parser')
-const traverse = require('@babel/traverse').default
-require('@babel/types')
-const fs = require('fs')
-const { resolve, dirname, join, extname } = require('path')
-const chalk = require('chalk')
-const postcss = require('postcss')
-const postcssLess = require('postcss-less')
-const postcssScss = require('postcss-scss')
-const postcssStripInlineComments = require('postcss-strip-inline-comments')
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import parser from '@babel/parser'
+import traverse from '@babel/traverse'
+import { resolve, dirname, join, extname } from 'path'
+import chalk from 'chalk'
+import postcss from 'postcss'
+import postcssScss from 'postcss-scss'
+import fs from 'fs'
+import vueSFCParser from '@cprize/vue-sfc-parser'
+
 const JS_EXTS = ['.js', '.jsx', '.ts', '.tsx']
 const CSS_EXTS = ['.css', '.less', '.scss']
 const JSON_EXTS = ['.json']
 
-let requirePathResolver = () => {}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+let requirePathResolver = (_curModulePath: string, _requirePath: string) => {}
+
+type Callback = (path: string) => void
 
 const MODULE_TYPES = {
   JS: 1 << 0,
@@ -21,7 +24,7 @@ const MODULE_TYPES = {
   VUE: 1 << 3,
 }
 
-function isDirectory(filePath) {
+function isDirectory(filePath: string) {
   try {
     return fs.statSync(filePath).isDirectory()
   } catch (e) {}
@@ -30,7 +33,7 @@ function isDirectory(filePath) {
 
 const visitedModules = new Set()
 
-function moduleResolver(curModulePath, requirePath) {
+function moduleResolver(curModulePath: string, requirePath: string) {
   if (typeof requirePathResolver === 'function') {
     const res = requirePathResolver(dirname(curModulePath), requirePath)
     if (typeof res === 'string') {
@@ -55,7 +58,7 @@ function moduleResolver(curModulePath, requirePath) {
   return requirePath
 }
 
-function completeModulePath(modulePath) {
+function completeModulePath(modulePath: string) {
   const EXTS = [...JSON_EXTS, ...JS_EXTS]
 
   for (const ext of [...EXTS, '.vue']) {
@@ -64,20 +67,21 @@ function completeModulePath(modulePath) {
     }
   }
 
-  function tryCompletePath(resolvePath) {
+  function tryCompletePath(resolvePath: (a: string) => string) {
     for (let i = 0; i < EXTS.length; i++) {
-      const tryPath = resolvePath(EXTS[i])
+      const tryPath = resolvePath(EXTS[i] ?? '')
       if (fs.existsSync(tryPath)) {
         return tryPath
       }
     }
+    return ''
   }
 
-  function reportModuleNotFoundError(modulePath) {
-    // console.log(chalk.red('module not found: ' + modulePath))
+  function reportModuleNotFoundError(modulePath: string) {
+    console.log(chalk.red(`module not found: ${modulePath}`))
   }
   if (!EXTS.some((ext) => modulePath.endsWith(ext))) {
-    const tryModulePath = tryCompletePath((ext) => modulePath + ext)
+    const tryModulePath = tryCompletePath((ext: string) => modulePath + ext)
     if (!tryModulePath) {
       // reportModuleNotFoundError(modulePath);
     } else {
@@ -95,18 +99,17 @@ function completeModulePath(modulePath) {
   return modulePath
 }
 
-function resolveBabelSyntaxtPlugins(modulePath) {
+function resolveBabelSyntaxtPlugins() {
   const plugins = []
   plugins.push('jsx')
   plugins.push('typescript')
   return plugins
 }
-
-function resolvePostcssSyntaxtPlugin(modulePath) {
-  return [postcssStripInlineComments, postcssScss]
+function resolvePostcssSyntaxtPlugin() {
+  return [postcssScss]
 }
 
-function getModuleType(modulePath) {
+function getModuleType(modulePath: string) {
   const moduleExt = extname(modulePath)
 
   if (JS_EXTS.some((ext) => ext === moduleExt)) {
@@ -117,16 +120,19 @@ function getModuleType(modulePath) {
     return MODULE_TYPES.JSON
   } else if (moduleExt === '.vue') {
     return MODULE_TYPES.VUE
+  } else {
+    return -1
   }
 }
 
-function traverseCssModule(curModulePath, callback) {
+function traverseCssModule(curModulePath: string, callback: Callback) {
   const moduleFileConent = fs.readFileSync(curModulePath, {
     encoding: 'utf-8',
   })
 
   const ast = postcss.parse(moduleFileConent, {
-    syntax: resolvePostcssSyntaxtPlugin(curModulePath),
+    // @ts-ignore
+    syntax: resolvePostcssSyntaxtPlugin(),
   })
   ast.walkAtRules('import', (rule) => {
     const subModulePath = moduleResolver(curModulePath, rule.params.replace(/['"]/g, ''))
@@ -138,7 +144,7 @@ function traverseCssModule(curModulePath, callback) {
   })
   ast.walkDecls((decl) => {
     if (decl.value.includes('url(')) {
-      const url = /.*url\((.+)\).*/.exec(decl.value)[1].replace(/['"]/g, '')
+      const url = /.*url\((.+)\).*/.exec(decl.value)?.[1]?.replace(/['"]/g, '') ?? ''
       const subModulePath = moduleResolver(curModulePath, url)
       if (!subModulePath) {
         return
@@ -148,18 +154,20 @@ function traverseCssModule(curModulePath, callback) {
   })
 }
 
-function traverseJsModule(curModulePath, callback) {
+function traverseJsModule(curModulePath: string, callback: Callback) {
   const moduleFileContent = fs.readFileSync(curModulePath, {
     encoding: 'utf-8',
   })
 
   const ast = parser.parse(moduleFileContent, {
     sourceType: 'unambiguous',
-    plugins: resolveBabelSyntaxtPlugins(curModulePath),
+    // @ts-ignore
+    plugins: resolveBabelSyntaxtPlugins(),
   })
 
   traverse(ast, {
     ImportDeclaration(path) {
+      // @ts-ignore
       const subModulePath = moduleResolver(curModulePath, path.get('source.value').node)
       if (!subModulePath) {
         return
@@ -180,6 +188,7 @@ function traverseJsModule(curModulePath, callback) {
     ExportDeclaration(path) {
       // FIXME: 需要判断是否为 export from 形式，临时用try-catch处理保护
       try {
+        // @ts-ignore
         const subModulePath = moduleResolver(curModulePath, path.get('source.value').node)
         if (!subModulePath) {
           return
@@ -193,21 +202,21 @@ function traverseJsModule(curModulePath, callback) {
   })
 }
 
-function traverseVueModule(curModulePath, callback) {
+function traverseVueModule(curModulePath: string, callback: Callback) {
   const moduleFileContent = fs.readFileSync(curModulePath, {
     encoding: 'utf-8',
   })
 
-  const { parse } = require('@vue/compiler-dom')
+  const descriptor = vueSFCParser.parse(moduleFileContent)
 
-  const descriptor = parse(moduleFileContent)
-
-  const ast = parser.parse(descriptor.children.find((item) => item.tag === 'script').children[0].content, {
+  const ast = parser.parse(descriptor.script.map((item) => item.content).join(''), {
     sourceType: 'unambiguous',
-    plugins: resolveBabelSyntaxtPlugins(curModulePath),
+    // @ts-ignore
+    plugins: resolveBabelSyntaxtPlugins(),
   })
   traverse(ast, {
     ImportDeclaration(path) {
+      // @ts-ignore
       const subModulePath = moduleResolver(curModulePath, path.get('source.value').node)
       if (!subModulePath) {
         return
@@ -228,38 +237,33 @@ function traverseVueModule(curModulePath, callback) {
       }
     },
   })
-  if (descriptor.children.find((item) => item.tag === 'style')) {
-    const cssContent = descriptor.children
-      .filter((item) => item.tag === 'style')
-      .map((item) => item?.children?.[0]?.content ?? '')
-      .join('\n')
-    console.log(cssContent)
-    const CSSast = postcss.parse(cssContent, {
-      syntax: resolvePostcssSyntaxtPlugin(curModulePath),
-    })
+  const cssContent = descriptor.style.map((item) => item.content).join('')
+  const CSSast = postcss.parse(cssContent, {
+    // @ts-ignore
+    syntax: resolvePostcssSyntaxtPlugin(),
+  })
 
-    CSSast.walkAtRules('import', (rule) => {
-      const subModulePath = moduleResolver(curModulePath, rule.params.replace(/['"]/g, ''))
+  CSSast.walkAtRules('import', (rule) => {
+    const subModulePath = moduleResolver(curModulePath, rule.params.replace(/['"]/g, ''))
+    if (!subModulePath) {
+      return
+    }
+    callback && callback(subModulePath)
+    traverseModule(subModulePath, callback)
+  })
+  CSSast.walkDecls((decl) => {
+    if (decl.value.includes('url(')) {
+      const url = /.*url\((.+)\).*/.exec(decl.value)?.[1]?.replace(/['"]/g, '') ?? ''
+      const subModulePath = moduleResolver(curModulePath, url)
       if (!subModulePath) {
         return
       }
       callback && callback(subModulePath)
-      traverseModule(subModulePath, callback)
-    })
-    CSSast.walkDecls((decl) => {
-      if (decl.value.includes('url(')) {
-        const url = /.*url\((.+)\).*/.exec(decl.value)[1].replace(/['"]/g, '')
-        const subModulePath = moduleResolver(curModulePath, url)
-        if (!subModulePath) {
-          return
-        }
-        callback && callback(subModulePath)
-      }
-    })
-  }
+    }
+  })
 }
 
-function traverseModule(curModulePath, callback) {
+function traverseModule(curModulePath: string, callback: Callback) {
   curModulePath = completeModulePath(curModulePath)
 
   const moduleType = getModuleType(curModulePath)
@@ -273,7 +277,8 @@ function traverseModule(curModulePath, callback) {
   }
 }
 
-module.exports.traverseModule = traverseModule
-module.exports.setRequirePathResolver = (resolver) => {
+const setRequirePathResolver = (resolver: () => void) => {
   requirePathResolver = resolver
 }
+
+export { traverseModule, setRequirePathResolver }

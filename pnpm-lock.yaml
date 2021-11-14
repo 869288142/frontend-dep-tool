@@ -34,7 +34,22 @@ importers:
       lerna: 3.22.1
 
   packages/dep-tool:
-    specifiers: {}
+    specifiers:
+      '@babel/parser': ^7.16.3
+      '@babel/traverse': ^7.16.3
+      '@cprize/vue-sfc-parser': ^1.0.0
+      chalk: ^4.1.2
+      fast-glob: ^3.2.7
+      postcss: ^8.3.11
+      postcss-scss: ^4.0.2
+    dependencies:
+      '@babel/parser': 7.16.3
+      '@babel/traverse': 7.16.3
+      '@cprize/vue-sfc-parser': link:../vue-sfc-parser
+      chalk: 4.1.2
+      fast-glob: 3.2.7
+      postcss: 8.3.11
+      postcss-scss: 4.0.2_postcss@8.3.11
 
   packages/vue-sfc-parser:
     specifiers:
@@ -5980,6 +5995,12 @@ packages:
       thenify-all: 1.6.0
     dev: true
 
+  /nanoid/3.1.30:
+    resolution: {integrity: sha1-Y/k8xUjSoRPcXfvGO/oJ4rm2Q2I=, tarball: nanoid/download/nanoid-3.1.30.tgz}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+    dev: false
+
   /nanomatch/1.2.13:
     resolution: {integrity: sha1-uHqKpPwN6P5r6IiVs4mD/yZb0Rk=, tarball: nanomatch/download/nanomatch-1.2.13.tgz}
     engines: {node: '>=0.10.0'}
@@ -6597,6 +6618,24 @@ packages:
     resolution: {integrity: sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=, tarball: posix-character-classes/download/posix-character-classes-0.1.1.tgz}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /postcss-scss/4.0.2_postcss@8.3.11:
+    resolution: {integrity: sha1-Od3MCrMvFV1asyjukTU9Z6UtU3s=, tarball: postcss-scss/download/postcss-scss-4.0.2.tgz}
+    engines: {node: '>=12.0'}
+    peerDependencies:
+      postcss: ^8.3.3
+    dependencies:
+      postcss: 8.3.11
+    dev: false
+
+  /postcss/8.3.11:
+    resolution: {integrity: sha1-w77KfqgRzV4cSj7G0udZnvH4+Fg=, tarball: postcss/download/postcss-8.3.11.tgz}
+    engines: {node: ^10 || ^12 || >=14}
+    dependencies:
+      nanoid: 3.1.30
+      picocolors: 1.0.0
+      source-map-js: 0.6.2
+    dev: false
 
   /prelude-ls/1.1.2:
     resolution: {integrity: sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=, tarball: prelude-ls/download/prelude-ls-1.1.2.tgz}
@@ -7279,6 +7318,11 @@ packages:
     dependencies:
       is-plain-obj: 1.1.0
     dev: true
+
+  /source-map-js/0.6.2:
+    resolution: {integrity: sha1-C7XeYxtBz72mz7qL0FqA79/SOF4=, tarball: source-map-js/download/source-map-js-0.6.2.tgz}
+    engines: {node: '>=0.10.0'}
+    dev: false
 
   /source-map-resolve/0.5.3:
     resolution: {integrity: sha1-GQhmvs51U+H48mei7oLGBrVQmho=, tarball: source-map-resolve/download/source-map-resolve-0.5.3.tgz}
