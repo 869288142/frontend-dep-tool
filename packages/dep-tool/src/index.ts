@@ -15,7 +15,7 @@ function findUnusedModule(options: {
   cwd: string
   entries: string[]
   includes: string[]
-  resolveRequirePath: () => string
+  resolveRequirePath: (curDir: string, requirePath: string) => string
 }) {
   let { includes } = Object.assign(defaultOptions, options)
 
