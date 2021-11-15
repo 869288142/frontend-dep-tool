@@ -13,8 +13,7 @@ const CSS_EXTS = ['.css', '.less', '.scss']
 const JSON_EXTS = ['.json']
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-let requirePathResolver
- = (_curModulePath: string, _requirePath: string) => ({})
+let requirePathResolver = (_curModulePath: string, _requirePath: string) => ({})
 
 type Callback = (path: string) => void
 
