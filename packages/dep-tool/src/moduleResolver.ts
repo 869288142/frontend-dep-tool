@@ -1,9 +1,10 @@
 import resolve from 'enhanced-resolve'
 
-const myResolve = resolve.create.sync({
-  extensions: ['.ts', '.js'],
-})
+interface ResolverOptions {
+  extensions?: string[]
+  alias?: Record<string, string>
+}
 
-export default function moduleResolver(ctx: string, path: string) {
-  return myResolve(ctx, path)
+export function getModuleResolver(resolverOptions: ResolverOptions) {
+  return resolve.create.sync(resolverOptions)
 }
