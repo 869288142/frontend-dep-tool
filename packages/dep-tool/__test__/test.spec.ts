@@ -1,19 +1,13 @@
-import path from 'path'
 import findUnusedModule from '../src/index'
-
-const { all, used, unused } = findUnusedModule({
-  cwd: process.cwd(),
-  entries: ['./demo-project/suzhe2.js'],
-  includes: ['./src/modules/wxAddFans/**/*'],
-  resolveRequirePath(_curDir: string, requirePath: string) {
-    if (requirePath.includes('@/')) {
-      return path.resolve(process.cwd(), requirePath.replace('@', './src'))
-    } else if (!requirePath.includes('.') || requirePath.includes('@fk') || requirePath.includes('@jz')) {
-      return ''
-    }
-    return requirePath
-  },
+describe('parse npm module', () => {
+  it('parse eslint', () => {
+    const { all, used, unused } = findUnusedModule({
+      cwd: __dirname,
+      entries: ['./demo/index.js'],
+      includes: ['./demo/**/*'],
+    })
+    console.log(JSON.stringify(unused))
+    console.log(JSON.stringify(all))
+    console.log(JSON.stringify(used))
+  })
 })
-console.log(JSON.stringify(unused))
-console.log(JSON.stringify(all))
-console.log(JSON.stringify(used))
