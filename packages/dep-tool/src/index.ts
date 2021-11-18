@@ -1,4 +1,4 @@
-import { traverseModule, setRequirePathResolver } from './traverseModule'
+import { traverseModule } from './traverseModule'
 
 import { resolve, normalize } from 'path'
 import fastGlob from 'fast-glob'
@@ -7,19 +7,12 @@ const defaultOptions = {
   cwd: '',
   entries: [],
   includes: ['**/*', '!node_modules'],
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  resolveRequirePath: () => {},
 }
 
-function findUnusedModule(options: {
-  cwd: string
-  entries: string[]
-  includes: string[]
-  resolveRequirePath: (curDir: string, requirePath: string) => string
-}) {
+function findUnusedModule(options: { cwd: string; entries: string[]; includes: string[] }) {
   let { includes } = Object.assign(defaultOptions, options)
 
-  const { cwd, entries, resolveRequirePath } = Object.assign(defaultOptions, options)
+  const { cwd, entries } = Object.assign(defaultOptions, options)
 
   includes = includes.map((includePath) => (cwd ? `${cwd.replace(/\\/g, '/')}/${includePath}` : includePath))
 
@@ -27,7 +20,6 @@ function findUnusedModule(options: {
   const entryModules: string[] = []
   const usedModules: string[] = []
 
-  setRequirePathResolver(resolveRequirePath)
   entries.forEach((entry) => {
     const entryPath = resolve(cwd, entry)
     entryModules.push(entryPath)

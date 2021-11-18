@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import parser from '@babel/parser'
+import * as parser from '@babel/parser'
 import traverse from '@babel/traverse'
-import { resolve, dirname, join, extname } from 'path'
-import chalk from 'chalk'
+import { extname } from 'path'
 import postcss from 'postcss'
 import postcssScss from 'postcss-scss'
 import fs from 'fs'
 import vueSFCParser from '@cprize/vue-sfc-parser'
-
+import { getModuleResolver } from '../src/moduleResolver'
 const JS_EXTS = ['.js', '.jsx', '.ts', '.tsx']
 const CSS_EXTS = ['.css', '.less', '.scss']
 const JSON_EXTS = ['.json']
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-let requirePathResolver = (_curModulePath: string, _requirePath: string) => ({})
 
 type Callback = (path: string) => void
 
@@ -24,31 +20,16 @@ const MODULE_TYPES = {
   VUE: 1 << 3,
 }
 
-function isDirectory(filePath: string) {
-  try {
-    return fs.statSync(filePath).isDirectory()
-  } catch (e) {}
-  return false
-}
-
 const visitedModules = new Set()
 
 function moduleResolver(curModulePath: string, requirePath: string) {
-  if (typeof requirePathResolver === 'function') {
-    const res = requirePathResolver(dirname(curModulePath), requirePath)
-    if (typeof res === 'string') {
-      requirePath = res
-    }
-  }
-
-  requirePath = resolve(dirname(curModulePath), requirePath)
+  // FIXME if parse fail return false?
+  requirePath = getModuleResolver({})(curModulePath, requirePath).toString()
 
   // 过滤掉第三方模块
   if (requirePath.includes('node_modules')) {
     return ''
   }
-
-  requirePath = completeModulePath(requirePath)
 
   if (visitedModules.has(requirePath)) {
     return ''
@@ -56,47 +37,6 @@ function moduleResolver(curModulePath: string, requirePath: string) {
     visitedModules.add(requirePath)
   }
   return requirePath
-}
-
-function completeModulePath(modulePath: string) {
-  const EXTS = [...JSON_EXTS, ...JS_EXTS]
-
-  for (const ext of [...EXTS, '.vue']) {
-    if (modulePath.includes(ext)) {
-      return modulePath
-    }
-  }
-
-  function tryCompletePath(resolvePath: (a: string) => string) {
-    for (let i = 0; i < EXTS.length; i++) {
-      const tryPath = resolvePath(EXTS[i] ?? '')
-      if (fs.existsSync(tryPath)) {
-        return tryPath
-      }
-    }
-    return ''
-  }
-
-  function reportModuleNotFoundError(modulePath: string) {
-    console.log(chalk.red(`module not found: ${modulePath}`))
-  }
-  if (!EXTS.some((ext) => modulePath.endsWith(ext))) {
-    const tryModulePath = tryCompletePath((ext: string) => modulePath + ext)
-    if (!tryModulePath) {
-      // reportModuleNotFoundError(modulePath);
-    } else {
-      return tryModulePath
-    }
-  }
-  if (isDirectory(modulePath)) {
-    const tryModulePath = tryCompletePath((ext) => join(modulePath, `index${ext}`))
-    if (!tryModulePath) {
-      reportModuleNotFoundError(modulePath)
-    } else {
-      return tryModulePath
-    }
-  }
-  return modulePath
 }
 
 function resolveBabelSyntaxtPlugins() {
@@ -264,8 +204,6 @@ function traverseVueModule(curModulePath: string, callback: Callback) {
 }
 
 function traverseModule(curModulePath: string, callback: Callback) {
-  curModulePath = completeModulePath(curModulePath)
-
   const moduleType = getModuleType(curModulePath)
 
   if (moduleType & MODULE_TYPES.JS) {
@@ -277,8 +215,4 @@ function traverseModule(curModulePath: string, callback: Callback) {
   }
 }
 
-const setRequirePathResolver = (resolver: (curDir: string, requirePath: string) => string) => {
-  requirePathResolver = resolver
-}
-
-export { traverseModule, setRequirePathResolver }
+export { traverseModule }
