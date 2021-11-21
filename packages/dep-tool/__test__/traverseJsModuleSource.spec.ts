@@ -1,13 +1,9 @@
-import findUnusedModule from '../src/index'
+import { traverseJsModule } from '../src/traverseJsModule'
+import path from 'path'
 describe('parse npm module', () => {
   it('parse eslint', () => {
-    const { all, used, unused } = findUnusedModule({
-      cwd: __dirname,
-      entries: ['./demo/index.js'],
-      includes: ['./demo/**/*'],
+    traverseJsModule(path.resolve(__dirname, './demo/index.ts'), (str: string) => {
+      console.log(str)
     })
-    console.log(JSON.stringify(unused))
-    console.log(JSON.stringify(all))
-    console.log(JSON.stringify(used))
   })
 })

@@ -4,6 +4,7 @@ import { getModuleResolver } from '../src/moduleResolver'
 import { traverseJsModule } from './traverseJsModule'
 import { traverseCssModule } from './traverseCssModule'
 import { traverseVueModule } from './traverseVueModule'
+import path from 'path'
 const JS_EXTS = ['.js', '.jsx', '.ts', '.tsx']
 const CSS_EXTS = ['.css', '.less', '.scss']
 const JSON_EXTS = ['.json']
@@ -21,7 +22,9 @@ const visitedModules = new Set()
 
 export function moduleResolver(curModulePath: string, requirePath: string) {
   // FIXME if parse fail return false?
-  requirePath = getModuleResolver({})(curModulePath, requirePath).toString()
+  requirePath = getModuleResolver({
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+  })(path.dirname(curModulePath), requirePath).toString()
 
   // 过滤掉第三方模块
   if (requirePath.includes('node_modules')) {

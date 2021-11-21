@@ -1,13 +1,13 @@
 import traverse from '@babel/traverse'
 import { Callback, moduleResolver, traverseModule } from './traverseModule'
 import { parseJsAST } from './parseJsAST'
-
 export function traverseJsModuleSource(moduleFileContent: string, curModulePath: string, callback: Callback) {
   const ast = parseJsAST(moduleFileContent)
-
+  // curModulePath = path.dirname(curModulePath)
   traverse(ast, {
     ImportDeclaration(path) {
       // @ts-ignore
+
       const subModulePath = moduleResolver(curModulePath, path.get('source.value').node)
       if (!subModulePath) {
         return
