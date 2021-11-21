@@ -5,13 +5,15 @@
   "author": "加把劲骑士 <869288142@qq.com>",
   "homepage": "",
   "license": "ISC",
-  "main": "index.ts",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
   },
   "scripts": {
-    "test": "jest --bail --coverage"
+    "test": "jest --bail --coverage",
+    "build": "tsc"
   },
   "dependencies": {
     "@babel/parser": "^7.16.3",

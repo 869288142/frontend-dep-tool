@@ -1,7 +1,8 @@
 {
   "name": "@cprize/vue-sfc-parser",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
   "author": "869288142 <869288142@qq.com>",
   "license": "MIT",
   "scripts": {

@@ -1,10 +1,12 @@
 {
   "extends": "@cprize/typescript-config",
     "compilerOptions": {
+      "module": "CommonJS",
       "sourceMap": true,
       "declaration": true,
       "declarationMap": true,
       "declarationDir": "./lib/types",
       "outDir": "./lib",
-  }
+  },
+  "include": ["./src"]
 }
