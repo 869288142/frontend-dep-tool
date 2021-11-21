@@ -5,6 +5,7 @@ export function traverseJsModuleSource(moduleFileContent: string, curModulePath:
   const ast = parseJsAST(moduleFileContent)
   // curModulePath = path.dirname(curModulePath)
   traverse(ast, {
+    // import x from y   import y
     ImportDeclaration(path) {
       // @ts-ignore
 
@@ -16,7 +17,7 @@ export function traverseJsModuleSource(moduleFileContent: string, curModulePath:
       traverseModule(subModulePath, callback)
     },
     CallExpression(path) {
-      if (path.get('callee').toString() === 'require' || path.get('callee').toString() === 'import') {
+      if (path.get('callee').toString() === 'import') {
         const subModulePath = moduleResolver(curModulePath, path.get('arguments.0').toString().replace(/['"]/g, ''))
         if (!subModulePath) {
           return

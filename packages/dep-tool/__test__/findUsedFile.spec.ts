@@ -1,13 +1,12 @@
 import findUnusedModule from '../src/index'
 describe('parse npm module', () => {
   it('parse eslint', () => {
-    const { all, used, unused } = findUnusedModule({
+    const { unused } = findUnusedModule({
       cwd: __dirname,
-      entries: ['./demo/index.js'],
-      includes: ['./demo/**/*'],
+      entries: ['./unsedTest/index.js'],
+      includes: ['./unsedTest/**/*'],
     })
-    console.log(JSON.stringify(unused))
-    console.log(JSON.stringify(all))
-    console.log(JSON.stringify(used))
+    expect(unused.length).toEqual(1)
+    expect(unused[0]).toMatch('unsed.js')
   })
 })
