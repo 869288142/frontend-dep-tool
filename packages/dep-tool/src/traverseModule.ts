@@ -4,6 +4,7 @@ import { getModuleResolver } from '../src/moduleResolver'
 import { traverseJsModule } from './traverseJsModule'
 import { traverseCssModule } from './traverseCssModule'
 import { traverseVueModule } from './traverseVueModule'
+import { ResolverOptions } from './ResolverOptions'
 import path from 'path'
 const JS_EXTS = ['.js', '.jsx', '.ts', '.tsx']
 const CSS_EXTS = ['.css', '.less', '.scss']
@@ -20,11 +21,9 @@ const MODULE_TYPES = {
 
 const visitedModules = new Set()
 
-export function moduleResolver(curModulePath: string, requirePath: string) {
+export function moduleResolver(curModulePath: string, requirePath: string, resolverOptions: ResolverOptions) {
   // FIXME if parse fail return false?
-  requirePath = getModuleResolver({
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
-  })(path.dirname(curModulePath), requirePath).toString()
+  requirePath = getModuleResolver(resolverOptions)(path.dirname(curModulePath), requirePath).toString()
 
   // 过滤掉第三方模块
   if (requirePath.includes('node_modules')) {
@@ -55,15 +54,15 @@ function getModuleType(modulePath: string) {
   }
 }
 
-function traverseModule(curModulePath: string, callback: Callback) {
+function traverseModule(curModulePath: string, callback: Callback, resolverOptions: ResolverOptions) {
   const moduleType = getModuleType(curModulePath)
 
   if (moduleType & MODULE_TYPES.JS) {
-    traverseJsModule(curModulePath, callback)
+    traverseJsModule(curModulePath, callback, resolverOptions)
   } else if (moduleType & MODULE_TYPES.CSS) {
-    traverseCssModule(curModulePath, callback)
+    traverseCssModule(curModulePath, callback, resolverOptions)
   } else if (moduleType & MODULE_TYPES.VUE) {
-    traverseVueModule(curModulePath, callback)
+    traverseVueModule(curModulePath, callback, resolverOptions)
   }
 }
 

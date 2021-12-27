@@ -1,9 +1,5 @@
 import resolve from 'enhanced-resolve'
-
-interface ResolverOptions {
-  extensions?: string[]
-  alias?: Record<string, string>
-}
+import { ResolverOptions } from './ResolverOptions'
 
 export function getModuleResolver(resolverOptions: ResolverOptions) {
   return resolve.create.sync(resolverOptions)

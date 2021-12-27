@@ -2,6 +2,7 @@ import { traverseModule } from './traverseModule'
 
 import { resolve, normalize } from 'path'
 import fastGlob from 'fast-glob'
+import { ResolverOptions } from './ResolverOptions'
 
 const defaultOptions = {
   cwd: '',
@@ -9,10 +10,15 @@ const defaultOptions = {
   includes: ['**/*', '!node_modules'],
 }
 
-function findUnusedModule(options: { cwd: string; entries: string[]; includes: string[] }) {
+function findUnusedModule(options: {
+  cwd: string
+  entries: string[]
+  includes: string[]
+  resolverOptions: ResolverOptions
+}) {
   let { includes } = Object.assign(defaultOptions, options)
 
-  const { cwd, entries } = Object.assign(defaultOptions, options)
+  const { cwd, entries, resolverOptions } = Object.assign(defaultOptions, options)
 
   includes = includes.map((includePath) => (cwd ? `${cwd.replace(/\\/g, '/')}/${includePath}` : includePath))
 
@@ -23,9 +29,13 @@ function findUnusedModule(options: { cwd: string; entries: string[]; includes: s
   entries.forEach((entry) => {
     const entryPath = resolve(cwd, entry)
     entryModules.push(entryPath)
-    traverseModule(entryPath, (modulePath) => {
-      usedModules.push(modulePath)
-    })
+    traverseModule(
+      entryPath,
+      (modulePath) => {
+        usedModules.push(modulePath)
+      },
+      resolverOptions
+    )
   })
 
   const unusedModules = allFiles.filter((filePath) => {
