@@ -17,14 +17,15 @@ export function traverseCssModuleSource(
     callback && callback(subModulePath)
     traverseModule(subModulePath, callback, resolverOptions)
   })
-  ast.walkDecls((decl) => {
-    if (decl.value.includes('url(')) {
-      const url = /.*url\((.+)\).*/.exec(decl.value)?.[1]?.replace(/['"]/g, '') ?? ''
-      const subModulePath = moduleResolver(curModulePath, url, resolverOptions)
-      if (!subModulePath) {
-        return
-      }
-      callback && callback(subModulePath)
-    }
-  })
+  // TODO open css url 
+  // ast.walkDecls((decl) => {
+  //   if (decl.value.includes('url(')) {
+  //     const url = /.*url\((.+)\).*/.exec(decl.value)?.[1]?.replace(/['"]/g, '') ?? ''
+  //     const subModulePath = moduleResolver(curModulePath, url, resolverOptions)
+  //     if (!subModulePath) {
+  //       return
+  //     }
+  //     callback && callback(subModulePath)
+  //   }
+  // })
 }
