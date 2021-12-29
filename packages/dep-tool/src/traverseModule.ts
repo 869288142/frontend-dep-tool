@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { extname } from 'path'
-import { getModuleResolver } from '../src/moduleResolver'
+import { getModuleResolver } from './moduleResolver'
 import { traverseJsModule } from './traverseJsModule'
 import { traverseCssModule } from './traverseCssModule'
 import { traverseVueModule } from './traverseVueModule'
