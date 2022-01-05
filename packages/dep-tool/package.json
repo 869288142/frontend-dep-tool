@@ -27,5 +27,8 @@
     "fast-glob": "^3.2.7",
     "postcss": "^8.3.11",
     "postcss-scss": "^4.0.2"
+  },
+  "devDependencies": {
+    "vuex": "^3.6.2"
   }
 }

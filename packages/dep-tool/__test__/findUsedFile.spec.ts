@@ -7,6 +7,8 @@ describe('parse npm module', () => {
       includes: ['./unsedTest/**/*'],
       resolverOptions: {
         extensions: ['.ts', '.tsx', '.js', '.jsx'],
+        // @ts-ignore
+        exportsFields: [],
       },
     })
     expect(unused.length).toEqual(1)
