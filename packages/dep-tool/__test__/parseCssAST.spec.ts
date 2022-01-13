@@ -26,5 +26,6 @@ describe('parse css AST', () => {
 describe('deal with inline comment', () => {
   it('remove scss inline comment', () => {
     expect(removeInlineComment('// a\n').trim()).toEqual('')
+    expect(removeInlineComment('a// a\n').trim()).toEqual('a')
   })
 })
